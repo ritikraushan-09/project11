@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF‑8">
+  <meta name="viewport" content="width=device‑width, initial‑scale=1.0">
+  <title>Quiz App</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column;
+           justify-content: center; align-items: center; height: 100vh; margin: 0;
+           background: linear-gradient(to right, #6DD5FA, #2979FF); color: #333; }
+    .quiz-container { background: #fff; border-radius: 10px; padding: 20px;
+                      box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 90%; max-width: 600px; }
+    #question { font-size: 24px; margin-bottom: 15px; }
+    .btn-grid { display: grid; grid-template-columns: repeat(2, auto); gap: 10px; }
+    .button { padding: 10px 15px; background: #007BFF; color: white; border: none;
+              border-radius: 5px; cursor: pointer; transition: 0.3s; }
+    .button:hover { background: #0056b3; }
+    #controls { display: flex; justify-content: center; margin-top: 20px; gap: 10px; }
+    .hide { display: none; }
+    .correct { background-color: #28a745; }
+    .wrong { background-color: #dc3545; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" id="quiz-app">
+    <h1>JavaScript Basics Quiz</h1>
+    <div id="question-container">
+      <div id="question">Question will appear here</div>
+      <div id="answer-buttons" class="btn-grid"></div>
+    </div>
+    <div id="controls">
+      <button id="start-btn" class="button">Start</button>
+      <button id="next-btn" class="button hide">Next</button>
+    </div>
+    <div id="results" class="hide"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { question: "Capital of France?", answers: ["Berlin","Madrid","Paris","Lisbon"], correct: "Paris" },
+      { question: "Largest planet?", answers: ["Earth","Mars","Jupiter","Saturn"], correct: "Jupiter" },
+      { question: "Land of the Rising Sun?", answers: ["China","Japan","India","S.Korea"], correct: "Japan" }
+    ];
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const questionEl = document.getElementById('question');
+    const answerButtonsEl = document.getElementById('answer-buttons');
+    const resultsEl = document.getElementById('results');
+    let currentIndex = 0, score = 0;
+
+    startBtn.addEventListener('click', () => {
+      startBtn.classList.add('hide');
+      showQuestion();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    function showQuestion() {
+      resetState();
+      const q = questions[currentIndex];
+      questionEl.textContent = q.question;
+      q.answers.forEach(ans => {
+        const btn = document.createElement('button');
+        btn.textContent = ans;
+        btn.className = 'button';
+        btn.addEventListener('click', () => selectAnswer(ans));
+        answerButtonsEl.appendChild(btn);
+      });
+    }
+
+    function resetState() {
+      clearStatus();
+      nextBtn.classList.add('hide');
+      answerButtonsEl.innerHTML = '';
+    }
+
+    function selectAnswer(ans) {
+      const correct = questions[currentIndex].correct;
+      Array.from(answerButtonsEl.children).forEach(btn => {
+        setStatus(btn, btn.textContent === correct);
+      });
+      if (ans === correct) score++;
+      nextBtn.classList.remove('hide');
+    }
+
+    function setStatus(btn, correct) {
+      btn.classList.add(correct ? 'correct' : 'wrong');
+    }
+
+    function clearStatus() {
+      Array.from(answerButtonsEl.children).forEach(btn => {
+        btn.classList.remove('correct','wrong');
+      });
+    }
+
+    function showResults() {
+      resetState();
+      questionEl.textContent = 'Quiz Completed!';
+      resultsEl.textContent = `Your Score: ${score} / ${questions.length}`;
+      resultsEl.classList.remove('hide');
+      nextBtn.textContent = 'Restart';
+      nextBtn.classList.remove('hide');
+      nextBtn.addEventListener('click', () => location.reload());
+    }
+  </script>
+</body>
+</html>
